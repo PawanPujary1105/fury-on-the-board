@@ -16,7 +16,7 @@ import { db } from "./firebase";
 function App() {
   console.log(db);
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/fury-on-the-board">
       <div className="min-h-screen bg-slate-950 text-white">
         <Navbar />
 
