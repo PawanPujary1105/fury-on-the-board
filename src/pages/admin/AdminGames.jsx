@@ -103,7 +103,7 @@ function AdminGames() {
 
     try {
       await deleteGame(id);
-      await loadGames();
+      await loadData();
       alert("Game deleted successfully!");
     } catch (error) {
       console.error(error);
