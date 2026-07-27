@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   addGame,
@@ -10,6 +10,11 @@ import { getPlayers } from "../../services/playerService";
 import { getSeasons } from "../../services/seasonService";
 
 function AdminGames() {
+  const isAuthenticated =
+    sessionStorage.getItem("adminAuthenticated") === "true";
+  if (!isAuthenticated) {
+    return <Navigate to="/admin" />;
+  }
   const [gameDate, setGameDate] = useState("");
   const [editingGame, setEditingGame] = useState(null);
   const [activeSeason, setActiveSeason] = useState(null);

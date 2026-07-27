@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   getSeasons,
@@ -9,6 +9,11 @@ import {
 } from "../../services/seasonService";
 
 function AdminSeasons() {
+  const isAuthenticated =
+    sessionStorage.getItem("adminAuthenticated") === "true";
+  if (!isAuthenticated) {
+    return <Navigate to="/admin" />;
+  }
   const [seasons, setSeasons] = useState([]);
   const [editingSeason, setEditingSeason] = useState(null);
   const [name, setName] = useState("");

@@ -63,14 +63,6 @@ function Navbar() {
           >
             History
           </NavLink>
-          <NavLink
-            to="/admin"
-            className={({ isActive }) =>
-              `${menuClass} ${isActive ? activeClass : inactiveClass}`
-            }
-          >
-            Admin
-          </NavLink>
         </div>
       </div>
     </nav>

@@ -7,6 +7,7 @@ import Leaderboard from "./pages/Leaderboard";
 import History from "./pages/History";
 import Results from "./pages/Results";
 import PlayerDetails from "./pages/PlayerDetails";
+import AdminLogin from "./pages/admin/AdminLogin";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminPlayers from "./pages/admin/AdminPlayers";
 import AdminGames from "./pages/admin/AdminGames";
@@ -29,12 +30,10 @@ function App() {
             <Route path="/history" element={<History />} />
             <Route path="/results" element={<Results />} />
             <Route path="/players/:playerName" element={<PlayerDetails />} />
-            <Route path="/admin" element={<AdminHome />} />
-
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin-home" element={<AdminHome />} />
             <Route path="/admin/players" element={<AdminPlayers />} />
-
             <Route path="/admin/games" element={<AdminGames />} />
-
             <Route path="/admin/seasons" element={<AdminSeasons />} />
           </Routes>
         </main>

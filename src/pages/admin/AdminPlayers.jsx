@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   addPlayer,
@@ -8,6 +8,11 @@ import {
 } from "../../services/playerService";
 
 function AdminPlayers() {
+  const isAuthenticated =
+    sessionStorage.getItem("adminAuthenticated") === "true";
+  if (!isAuthenticated) {
+    return <Navigate to="/admin" />;
+  }
   const [name, setName] = useState("");
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [rapidRating, setRapidRating] = useState("");
