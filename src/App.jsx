@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Players from "./pages/Players";
@@ -16,7 +16,7 @@ import { db } from "./firebase";
 function App() {
   console.log(db);
   return (
-    <BrowserRouter basename="/fury-on-the-board">
+    <HashRouter>
       <div className="min-h-screen bg-slate-950 text-white">
         <Navbar />
 
@@ -39,7 +39,7 @@ function App() {
           </Routes>
         </main>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
