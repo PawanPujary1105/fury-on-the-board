@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getGames } from "../services/gameService";
+import { formatDate } from "../utils/dateUtils";
 
 function Results() {
   const [games, setGames] = useState([]);
@@ -9,15 +10,21 @@ function Results() {
 
   async function loadGames() {
     const data = await getGames();
-    setGames(data);
+    const sortedGames = data
+      .filter((game) => game.status === "Completed")
+      .sort((a, b) => {
+        const dateComparison = new Date(b.gameDate) - new Date(a.gameDate);
+        if (dateComparison !== 0) {
+          return dateComparison;
+        }
+        return b.round - a.round;
+      });
+    setGames(sortedGames);
   }
-  const results = games
-    .filter((game) => game.status === "Completed")
-    .sort((a, b) => new Date(b.gameDate) - new Date(a.gameDate));
   return (
     <div>
       <h2 className="text-3xl font-bold mb-6">Results</h2>
-      {results.length === 0 ? (
+      {games.length === 0 ? (
         <div className="bg-slate-900 rounded-lg p-8 text-center">
           <h3 className="text-xl font-semibold text-slate-300">
             No Results Yet
@@ -27,18 +34,18 @@ function Results() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {results.map((match) => (
-            <div key={match.id} className="bg-slate-900 p-5 rounded-lg">
-              <div className="flex justify-between mb-3">
-                <span className="text-slate-400">{match.format}</span>
-                <span className="text-emerald-400">{match.status}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>{match.white}</span>
-                <span className="font-bold text-amber-400">{match.result}</span>
-                <span>{match.black}</span>
-              </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {games.map((game) => (
+            <div key={game.id} className="bg-slate-900 p-5 rounded-lg">
+              <p className="text-sm text-amber-400 font-medium">
+                {game.format} • Round {game.round}
+              </p>
+              <h3 className="text-xl font-bold my-3">
+                {game.white}
+                <span className="mx-3 text-amber-400">{game.result}</span>
+                {game.black}
+              </h3>
+              <p className="text-slate-400">{formatDate(game.gameDate)}</p>
             </div>
           ))}
         </div>

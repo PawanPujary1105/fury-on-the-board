@@ -10,15 +10,22 @@ function Fixtures() {
 
   async function loadGames() {
     const data = await getGames();
-    setGames(data);
+    const sortedGames = data
+      .filter((game) => game.status === "Scheduled")
+      .sort((a, b) => {
+        const dateComparison = new Date(a.gameDate) - new Date(b.gameDate);
+        if (dateComparison !== 0) {
+          return dateComparison;
+        }
+        return a.round - b.round;
+      });
+    setGames(sortedGames);
   }
-  const fixtures = games
-    .filter((game) => game.status === "Scheduled")
-    .sort((a, b) => new Date(a.gameDate) - new Date(b.gameDate));
+
   return (
     <div>
       <h2 className="text-3xl font-bold mb-6">Fixtures</h2>
-      {fixtures.length === 0 ? (
+      {games.length === 0 ? (
         <div className="bg-slate-900 rounded-lg p-8 text-center">
           <h3 className="text-xl font-semibold text-slate-300">
             No Upcoming Games
@@ -29,14 +36,8 @@ function Fixtures() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
-          {fixtures.map((fixture) => (
-            <FixtureCard
-              key={fixture.id}
-              day={fixture.day}
-              format={fixture.format}
-              white={fixture.white}
-              black={fixture.black}
-            />
+          {games.map((game) => (
+            <FixtureCard key={game.id} game={game} />
           ))}
         </div>
       )}

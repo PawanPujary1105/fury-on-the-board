@@ -1,17 +1,15 @@
-function FixtureCard({ day, format, white, black }) {
+import { formatDate } from "../utils/dateUtils";
+
+function FixtureCard({ game }) {
   return (
     <div className="bg-slate-900 p-5 rounded-lg">
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-slate-400">{day}</p>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${format === "Rapid" ? "bg-blue-600 text-white" : "bg-purple-600 text-white"}`}
-        >
-          {format.toUpperCase()}
-        </span>
-      </div>
-      <h3 className="text-xl font-semibold">{white}</h3>
-      <p className="text-center py-2 text-slate-400">vs</p>
-      <h3 className="text-xl font-semibold">{black}</h3>
+      <p className="text-sm text-amber-400 font-medium">
+        {game.format} • Round {game.round}
+      </p>
+      <h3 className="text-xl font-bold my-3">
+        {game.white} vs {game.black}
+      </h3>
+      <p className="text-slate-400">{formatDate(game.gameDate)}</p>
     </div>
   );
 }

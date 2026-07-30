@@ -1,29 +1,27 @@
 import { formatDate } from "../utils/dateUtils";
 
-function RecentResultsCard({ results }) {
+function UpcomingMatchesCard({ matches }) {
   return (
     <div className="bg-slate-900 p-5 rounded-lg">
-      <h3 className="text-xl font-semibold mb-3">Recent Results</h3>
+      <h3 className="text-xl font-semibold mb-3">Upcoming Matches</h3>
 
-      {results.length === 0 ? (
+      {matches.length === 0 ? (
         <div className="p-8 text-center">
           <h3 className="text-xl font-semibold text-slate-300">
-            No Results Yet
+            No Upcoming Games
           </h3>
           <p className="text-slate-500 mt-2">
-            Complete a game from the Admin Games page.
+            Create a game from the Admin Games page.
           </p>
         </div>
       ) : (
-        results.map((match) => (
+        matches.map((match) => (
           <div
             key={match.id}
             className="py-3 border-b border-slate-700 last:border-b-0"
           >
             <p className="font-medium">
-              {match.white}
-              <span className="mx-2 text-amber-400">{match.result}</span>
-              {match.black}
+              {match.white} vs {match.black}
             </p>
             <p className="text-sm text-slate-400">
               {match.format} • Round {match.round} •{" "}
@@ -36,4 +34,4 @@ function RecentResultsCard({ results }) {
   );
 }
 
-export default RecentResultsCard;
+export default UpcomingMatchesCard;

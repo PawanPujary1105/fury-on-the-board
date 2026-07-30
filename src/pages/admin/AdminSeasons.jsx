@@ -1,5 +1,6 @@
 import { Link, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import LoadingOverlay from "../../components/LoadingOverlay";
 import {
   getSeasons,
   addSeason,
@@ -14,6 +15,7 @@ function AdminSeasons() {
   if (!isAuthenticated) {
     return <Navigate to="/admin" />;
   }
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [seasons, setSeasons] = useState([]);
   const [editingSeason, setEditingSeason] = useState(null);
   const [name, setName] = useState("");
@@ -24,7 +26,13 @@ function AdminSeasons() {
     "w-full p-2 rounded bg-slate-800 text-white border border-slate-700 placeholder-slate-400";
 
   useEffect(() => {
-    loadSeasons();
+    async function initialize() {
+      setLoadingMessage("Loading Admin Seasons...");
+      await loadSeasons();
+      setLoadingMessage("");
+    }
+
+    initialize();
   }, []);
 
   async function loadSeasons() {
@@ -50,6 +58,9 @@ function AdminSeasons() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoadingMessage(
+      editingSeason ? "Updating Season..." : "Adding Season...",
+    );
 
     const seasonData = {
       name: name.trim(),
@@ -76,6 +87,7 @@ function AdminSeasons() {
       console.error(error);
       alert("Operation failed");
     }
+    setLoadingMessage("");
   }
 
   function handleEdit(season) {
@@ -88,6 +100,7 @@ function AdminSeasons() {
   }
 
   async function handleDelete(id) {
+    setLoadingMessage("Deleting Season...");
     const confirmed = window.confirm("Delete this season?");
 
     if (!confirmed) {
@@ -102,6 +115,7 @@ function AdminSeasons() {
       console.error(error);
       alert("Failed to delete season");
     }
+    setLoadingMessage("");
   }
 
   const isFormValid = name.trim();
@@ -226,6 +240,7 @@ function AdminSeasons() {
           </div>
         )}
       </div>
+      {loadingMessage && <LoadingOverlay message={loadingMessage} />}
     </div>
   );
 }

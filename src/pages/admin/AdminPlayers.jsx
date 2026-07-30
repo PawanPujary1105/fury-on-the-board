@@ -1,5 +1,6 @@
 import { Link, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import LoadingOverlay from "../../components/LoadingOverlay";
 import {
   addPlayer,
   updatePlayer,
@@ -13,6 +14,7 @@ function AdminPlayers() {
   if (!isAuthenticated) {
     return <Navigate to="/admin" />;
   }
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [name, setName] = useState("");
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [rapidRating, setRapidRating] = useState("");
@@ -22,13 +24,21 @@ function AdminPlayers() {
     "w-full p-2 mb-3 rounded bg-slate-800 text-white border border-slate-700 placeholder-slate-400";
   const [players, setPlayers] = useState([]);
   useEffect(() => {
-    loadPlayers();
+    async function initialize() {
+      setLoadingMessage("Loading Admin Players...");
+      await loadPlayers();
+      setLoadingMessage("");
+    }
+
+    initialize();
   }, []);
 
   async function loadPlayers() {
     const data = await getPlayers();
-    setPlayers(data);
+    const sortedPlayers = data.sort((a, b) => a.name.localeCompare(b.name));
+    setPlayers(sortedPlayers);
   }
+
   function clearForm() {
     setName("");
     setRapidRating("");
@@ -38,6 +48,11 @@ function AdminPlayers() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoadingMessage(
+      editingPlayer
+        ? "Updating Player..."
+        : setLoadingMessage("Adding Player..."),
+    );
 
     const playerData = {
       name: name.trim(),
@@ -60,9 +75,11 @@ function AdminPlayers() {
       console.error(error);
       alert("Operation failed");
     }
+    setLoadingMessage("");
   }
 
   async function handleDelete(id) {
+    setLoadingMessage("Deleting Player...");
     const confirmed = window.confirm("Delete this player?");
 
     if (!confirmed) {
@@ -80,6 +97,7 @@ function AdminPlayers() {
 
       alert("Failed to delete player");
     }
+    setLoadingMessage("");
   }
 
   function handleEdit(player) {
@@ -137,38 +155,49 @@ function AdminPlayers() {
       </form>
       <div className="bg-slate-900 p-6 rounded-lg mt-8">
         <h3 className="text-xl font-bold mb-4">Current Players</h3>
+        {players.length === 0 ? (
+          <div className="p-8 text-center">
+            <h3 className="text-xl font-semibold text-slate-300">
+              No Players Available
+            </h3>
+            <p className="text-slate-500 mt-2">
+              Create your first player from the form above.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {players.map((player) => (
+              <div
+                key={player.id}
+                className="flex justify-between items-center bg-slate-800 p-3 rounded"
+              >
+                <div>
+                  <span>♟️ {player.name}</span>
+                  <p className="text-slate-400 text-sm">
+                    Rapid: {player.rapidRating}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(player)}
+                    className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-white"
+                  >
+                    Edit
+                  </button>
 
-        <div className="space-y-2">
-          {players.map((player) => (
-            <div
-              key={player.id}
-              className="flex justify-between items-center bg-slate-800 p-3 rounded"
-            >
-              <div>
-                <span>♟️ {player.name}</span>
-                <p className="text-slate-400 text-sm">
-                  Rapid: {player.rapidRating}
-                </p>
+                  <button
+                    onClick={() => handleDelete(player.id)}
+                    className="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-white"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(player)}
-                  className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-white"
-                >
-                  Edit
-                </button>
-
-                <button
-                  onClick={() => handleDelete(player.id)}
-                  className="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-white"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
+      {loadingMessage && <LoadingOverlay message={loadingMessage} />}
     </div>
   );
 }

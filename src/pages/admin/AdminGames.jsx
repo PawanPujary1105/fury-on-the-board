@@ -1,5 +1,6 @@
 import { Link, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import LoadingOverlay from "../../components/LoadingOverlay";
 import {
   addGame,
   updateGame,
@@ -8,6 +9,7 @@ import {
 } from "../../services/gameService";
 import { getPlayers } from "../../services/playerService";
 import { getSeasons } from "../../services/seasonService";
+import { formatDate } from "../../utils/dateUtils";
 
 function AdminGames() {
   const isAuthenticated =
@@ -15,6 +17,7 @@ function AdminGames() {
   if (!isAuthenticated) {
     return <Navigate to="/admin" />;
   }
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [gameDate, setGameDate] = useState("");
   const [editingGame, setEditingGame] = useState(null);
   const [activeSeason, setActiveSeason] = useState(null);
@@ -35,16 +38,39 @@ function AdminGames() {
   }, []);
 
   async function loadData() {
+    setLoadingMessage("Loading Admin Games...");
     const [playersData, gamesData, seasonsData] = await Promise.all([
       getPlayers(),
       getGames(),
       getSeasons(),
     ]);
     const active = seasonsData.find((season) => season.active);
+    const sortedGames = gamesData.sort((a, b) => {
+      const dateComparison = new Date(b.gameDate) - new Date(a.gameDate);
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+      return b.round - a.round;
+    });
     setPlayers(playersData);
-    setGames(gamesData);
+    setGames(sortedGames);
     setActiveSeason(active || null);
     setSeasons(seasonsData);
+    setLoadingMessage("");
+  }
+
+  async function loadGames() {
+    const data = await getGames();
+    const sortedGames = data.sort((a, b) => {
+      const dateComparison = new Date(b.gameDate) - new Date(a.gameDate);
+
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+
+      return b.round - a.round;
+    });
+    setGames(sortedGames);
   }
 
   function clearForm() {
@@ -60,6 +86,9 @@ function AdminGames() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoadingMessage(
+      editingGame ? "Updating Game..." : setLoadingMessage("Adding Game..."),
+    );
 
     if (white === black) {
       alert("White and Black players cannot be the same");
@@ -91,15 +120,17 @@ function AdminGames() {
         alert("Game added successfully!");
       }
 
-      await loadData();
+      await loadGames();
       clearForm();
     } catch (error) {
       console.error(error);
       alert("Operation failed");
     }
+    setLoadingMessage("");
   }
 
   async function handleDelete(id) {
+    setLoadingMessage("Deleting Game...");
     const confirmed = window.confirm("Delete this game?");
 
     if (!confirmed) {
@@ -108,12 +139,13 @@ function AdminGames() {
 
     try {
       await deleteGame(id);
-      await loadData();
+      await loadGames();
       alert("Game deleted successfully!");
     } catch (error) {
       console.error(error);
       alert("Failed to delete game");
     }
+    setLoadingMessage("");
   }
 
   function handleEdit(game) {
@@ -277,31 +309,37 @@ function AdminGames() {
         ) : (
           <div className="space-y-2">
             {games.map((game) => (
-              <div
-                key={game.id}
-                className="flex justify-between items-center bg-slate-800 p-3 rounded"
-              >
-                <div>
-                  <p>
-                    {game.white} vs {game.black}
-                  </p>
-                  <p className="text-sm text-slate-400">
-                    {getSeasonName(game.seasonId)}
-                  </p>
-                  <p className="text-sm text-slate-400">
-                    {game.format} • Round {game.round}
-                  </p>
-                  <p className="text-sm text-slate-400"> {game.gameDate} </p>
-                  <p className="text-sm text-slate-400"> {game.result} </p>
+              <div key={game.id} className="bg-slate-800 p-4 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-semibold text-lg">
+                      {game.white} vs {game.black}
+                    </h4>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-semibold ${
+                      game.status === "Scheduled"
+                        ? "bg-amber-900 text-amber-400"
+                        : "bg-emerald-900 text-emerald-400"
+                    }`}
+                  >
+                    {game.status.toUpperCase()}
+                  </span>
                 </div>
-                <div className="flex gap-2">
+                <div className="mt-3 space-y-1 text-sm text-slate-400">
+                  <p>
+                    {getSeasonName(game.seasonId)} • {formatDate(game.gameDate)}{" "}
+                    • {game.format} • Round {game.round}
+                  </p>
+                  {game.status === "Completed" && <p>Result: {game.result}</p>}
+                </div>
+                <div className="flex justify-end gap-2 mt-4">
                   <button
                     onClick={() => handleEdit(game)}
                     className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-white"
                   >
                     Edit
                   </button>
-
                   <button
                     onClick={() => handleDelete(game.id)}
                     className="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-white"
@@ -314,6 +352,7 @@ function AdminGames() {
           </div>
         )}
       </div>
+      {loadingMessage && <LoadingOverlay message={loadingMessage} />}
     </div>
   );
 }
