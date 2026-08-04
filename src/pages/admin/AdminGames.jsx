@@ -27,6 +27,7 @@ function AdminGames() {
   const [black, setBlack] = useState("");
   const [status, setStatus] = useState("Scheduled");
   const [result, setResult] = useState("Pending");
+  const [gameLink, setGameLink] = useState("");
   const inputClass =
     "w-full p-2 mb-3 rounded bg-slate-800 text-white border border-slate-700 placeholder-slate-400";
 
@@ -82,6 +83,7 @@ function AdminGames() {
     setBlack("");
     setStatus("Scheduled");
     setResult("Pending");
+    setGameLink("");
   }
 
   async function handleSubmit(e) {
@@ -109,6 +111,7 @@ function AdminGames() {
       black,
       status,
       result: status === "Scheduled" ? "Pending" : result,
+      gameLink: status === "Completed" ? gameLink : "",
     };
 
     try {
@@ -157,6 +160,7 @@ function AdminGames() {
     setBlack(game.black);
     setStatus(game.status);
     setResult(game.result);
+    setGameLink(game.gameLink || "");
   }
 
   function getSeasonName(seasonId) {
@@ -284,6 +288,17 @@ function AdminGames() {
                 <option>0-1</option>
                 <option>1-1</option>
               </select>
+            )}
+            {status === "Completed" && (
+              <div>
+                <input
+                  type="url"
+                  value={gameLink}
+                  onChange={(e) => setGameLink(e.target.value)}
+                  placeholder="Game Link"
+                  className={inputClass}
+                />
+              </div>
             )}
           </div>
           <button

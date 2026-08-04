@@ -45,7 +45,20 @@ function Results() {
                 <span className="mx-3 text-amber-400">{game.result}</span>
                 {game.black}
               </h3>
-              <p className="text-slate-400">{formatDate(game.gameDate)}</p>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-slate-400">{formatDate(game.gameDate)}</p>
+
+                {game.gameLink && (
+                  <a
+                    href={game.gameLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:text-amber-300 text-sm font-medium"
+                  >
+                    Relive Battle
+                  </a>
+                )}
+              </div>
             </div>
           ))}
         </div>
