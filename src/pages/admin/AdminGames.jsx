@@ -137,6 +137,7 @@ function AdminGames() {
     const confirmed = window.confirm("Delete this game?");
 
     if (!confirmed) {
+      setLoadingMessage("");
       return;
     }
 

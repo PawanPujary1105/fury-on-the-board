@@ -83,6 +83,7 @@ function AdminPlayers() {
     const confirmed = window.confirm("Delete this player?");
 
     if (!confirmed) {
+      setLoadingMessage("");
       return;
     }
 

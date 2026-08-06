@@ -104,6 +104,7 @@ function AdminSeasons() {
     const confirmed = window.confirm("Delete this season?");
 
     if (!confirmed) {
+      setLoadingMessage("");
       return;
     }
 
